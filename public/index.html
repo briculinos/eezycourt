@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EezyCourt - AI Legal Dispute Resolution</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: bold;
+            color: #22c55e;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(34, 197, 94, 0.2);
+        }
+
+        .tagline {
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #1e293b;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #22c55e;
+        }
+
+        .upload-area {
+            border: 3px dashed #22c55e;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #f0fdf4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            background: #dcfce7;
+            border-color: #16a34a;
+        }
+
+        .upload-area.dragover {
+            background: #bbf7d0;
+            border-color: #16a34a;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #22c55e;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #16a34a;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-icon {
+            color: #22c55e;
+            font-size: 24px;
+        }
+
+        .party-select {
+            padding: 8px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 15px;
+            background: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .analyze-btn:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .analyze-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .verdict-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .verdict-section.show {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #22c55e;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .verdict-content {
+            margin-top: 20px;
+        }
+
+        .verdict-label {
+            font-weight: bold;
+            color: #1e293b;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .verdict-text {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #22c55e;
+            line-height: 1.6;
+            color: #475569;
+        }
+
+        .recommendations {
+            list-style: none;
+            padding: 0;
+        }
+
+        .recommendations li {
+            padding: 10px 15px;
+            background: #f0fdf4;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 3px solid #22c55e;
+        }
+
+        .confidence-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #22c55e;
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #dc2626;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚖️ EezyCourt</div>
+            <div class="tagline">AI-Powered Legal Dispute Resolution System</div>
+        </div>
+
+        <div class="upload-section">
+            <h2 class="section-title">Upload Dispute Documents</h2>
+
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Click to upload or drag and drop files here</div>
+                <p style="color: #64748b; margin-top: 10px; font-size: 14px;">
+                    Supported formats: PDF, TXT (Max 10MB per file)
+                </p>
+            </div>
+
+            <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.txt">
+
+            <div class="file-list" id="fileList"></div>
+
+            <button class="analyze-btn" id="analyzeBtn" disabled>
+                🔍 Analyze Dispute & Generate Verdict
+            </button>
+        </div>
+
+        <div class="verdict-section" id="verdictSection">
+            <h2 class="section-title">⚖️ Judicial Verdict</h2>
+            <div id="verdictContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const verdictSection = document.getElementById('verdictSection');
+        const verdictContent = document.getElementById('verdictContent');
+
+        let selectedFiles = [];
+
+        // Upload area click
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        function handleFiles(files) {
+            for (let file of files) {
+                if (file.type === 'application/pdf' || file.type === 'text/plain') {
+                    selectedFiles.push(file);
+                }
+            }
+            renderFileList();
+            updateAnalyzeButton();
+        }
+
+        function renderFileList() {
+            fileList.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-icon">📄</div>
+                        <div>
+                            <strong>${file.name}</strong><br>
+                            <small style="color: #64748b;">${(file.size / 1024).toFixed(2)} KB</small>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select class="party-select" data-index="${index}">
+                            <option value="Party A">Party A</option>
+                            <option value="Party B">Party B</option>
+                            <option value="Evidence">Evidence</option>
+                        </select>
+                        <button class="remove-btn" onclick="removeFile(${index})">Remove</button>
+                    </div>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            renderFileList();
+            updateAnalyzeButton();
+        }
+
+        function updateAnalyzeButton() {
+            analyzeBtn.disabled = selectedFiles.length === 0;
+        }
+
+        analyzeBtn.addEventListener('click', async () => {
+            if (selectedFiles.length === 0) return;
+
+            // Show loading
+            verdictSection.classList.add('show');
+            verdictContent.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="color: #64748b;">Analyzing documents with AI agents...</p>
+                    <p style="color: #94a3b8; font-size: 14px; margin-top: 10px;">
+                        This may take a few moments
+                    </p>
+                </div>
+            `;
+
+            try {
+                // Upload files
+                const formData = new FormData();
+                selectedFiles.forEach((file, index) => {
+                    formData.append('documents', file);
+                    const partySelect = document.querySelector(`select[data-index="${index}"]`);
+                    formData.append(`party_${index}`, partySelect ? partySelect.value : 'Unknown');
+                });
+
+                const uploadResponse = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error('Failed to upload documents');
+                }
+
+                const uploadData = await uploadResponse.json();
+                const caseId = uploadData.caseId;
+
+                // Analyze case
+                const analyzeResponse = await fetch(`/api/analyze/${caseId}`, {
+                    method: 'POST'
+                });
+
+                if (!analyzeResponse.ok) {
+                    throw new Error('Failed to analyze case');
+                }
+
+                const analyzeData = await analyzeResponse.json();
+                displayVerdict(analyzeData.verdict);
+
+            } catch (error) {
+                verdictContent.innerHTML = `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        });
+
+        function displayVerdict(verdict) {
+            verdictContent.innerHTML = `
+                <div class="verdict-content">
+                    <div class="verdict-label">Verdict:</div>
+                    <div class="verdict-text">${verdict.verdict}</div>
+
+                    <div class="verdict-label">Reasoning:</div>
+                    <div class="verdict-text">${verdict.reasoning}</div>
+
+                    <div class="verdict-label">Recommendations:</div>
+                    <ul class="recommendations">
+                        ${verdict.recommendations.map(rec => `<li>✓ ${rec}</li>`).join('')}
+                    </ul>
+
+                    <div class="verdict-label">Confidence Level:</div>
+                    <span class="confidence-badge">${verdict.confidence}</span>
+
+                    <div style="margin-top: 30px; padding: 15px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                        <strong style="color: #92400e;">⚠️ Important Notice:</strong>
+                        <p style="color: #92400e; margin-top: 5px;">
+                            This is an AI-assisted analysis for informational purposes only.
+                            Final legal decisions should be made by qualified legal professionals.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+LEGAL COMPLAINT - PARTY A (TechCorp Inc.)
+
+Case Reference: TC-2024-001
+Date Filed: January 15, 2024
+
+PLAINTIFF: TechCorp Inc.
+DEFENDANT: DataSystems LLC
+
+NATURE OF DISPUTE:
+Contract Breach - Software Development Agreement
+
+FACTUAL BACKGROUND:
+On March 1, 2023, TechCorp Inc. (Plaintiff) entered into a Software Development Agreement with DataSystems LLC (Defendant) for the development of a custom enterprise resource planning (ERP) system. The contract value was $500,000, with specific deliverables and timelines outlined in Exhibit A.
+
+KEY CLAIMS:
+1. DataSystems LLC failed to deliver the completed ERP system by the agreed deadline of December 31, 2023.
+
+2. The delivered software components contain critical bugs and do not meet the specifications outlined in the Statement of Work (SOW).
+
+3. DataSystems LLC has been unresponsive to requests for bug fixes and system improvements since November 2023.
+
+4. The delays and quality issues have caused TechCorp Inc. to lose a major client contract worth $1.2 million.
+
+EVIDENCE PRESENTED:
+- Original Software Development Agreement dated March 1, 2023
+- Statement of Work (SOW) with detailed technical specifications
+- Email correspondence showing repeated requests for updates and bug fixes
+- Third-party technical audit report documenting 47 critical bugs
+- Documentation of lost client contract due to ERP system delays
+- Payment records showing TechCorp paid $400,000 (80% of contract value)
+
+CONTRACTUAL OBLIGATIONS:
+Section 4.2 of the Agreement states: "Contractor shall deliver a fully functional ERP system meeting all specifications outlined in the SOW by December 31, 2023."
+
+Section 5.1 states: "Contractor warrants that all deliverables shall be free from material defects and shall conform to the specifications."
+
+RELIEF SOUGHT:
+1. Full refund of $400,000 paid to DataSystems LLC
+2. Compensation for lost client contract: $1.2 million
+3. Additional damages for project delays and business disruption: $300,000
+4. Legal fees and court costs
+
+Total damages sought: $1,900,000
+
+LEGAL BASIS:
+- Breach of Contract
+- Professional Negligence
+- Breach of Warranty
+
+The evidence clearly demonstrates that DataSystems LLC failed to fulfill their contractual obligations, resulting in substantial financial harm to TechCorp Inc. We request the court to rule in favor of TechCorp Inc. and award the full damages sought.
+
+Respectfully submitted,
+Legal Team - TechCorp Inc.

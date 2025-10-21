@@ -1,0 +1,18 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+dist/
+build/
+.cache/
+
+# Env & secrets
+.env
+.env.*
+*.pem
+*.key
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
