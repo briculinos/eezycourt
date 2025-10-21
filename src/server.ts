@@ -14,6 +14,11 @@ dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
+// Trust proxy (nginx)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Configure Passport
 configurePassport();
 
@@ -52,7 +57,7 @@ const upload = multer({
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || process.env.BASE_URL || 'http://localhost:3000',
   credentials: true,
 }));
 app.use(express.json());
@@ -63,10 +68,13 @@ app.use(
     secret: process.env.SESSION_SECRET || 'eezycourt-secret-change-in-production',
     resave: false,
     saveUninitialized: false,
+    proxy: process.env.NODE_ENV === 'production', // Trust proxy in production (nginx)
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+      domain: process.env.NODE_ENV === 'production' ? 'eezycourt.services' : undefined,
     },
   })
 );
