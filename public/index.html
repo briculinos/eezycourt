@@ -348,6 +348,57 @@
             padding: 15px 40px;
             box-shadow: 0 10px 25px rgba(34, 197, 94, 0.2);
         }
+        .verdict-text {
+            line-height: 1.8;
+        }
+
+        .verdict-text h1, .verdict-text h2, .verdict-text h3 {
+            color: #1e293b;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .verdict-text h1 {
+            font-size: 24px;
+            border-bottom: 2px solid #22c55e;
+            padding-bottom: 8px;
+        }
+
+        .verdict-text h2 {
+            font-size: 20px;
+            margin-top: 25px;
+        }
+
+        .verdict-text h3 {
+            font-size: 18px;
+        }
+
+        .verdict-text strong {
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        .verdict-text ul, .verdict-text ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        .verdict-text li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .verdict-text p {
+            margin: 12px 0;
+        }
+
+        .verdict-text code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -568,25 +619,56 @@
             }
         });
 
+        // Simple markdown-to-HTML converter
+        function parseMarkdown(text) {
+            return text
+                // Headers
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                // Bold
+                .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/__(.+?)__/g, '<strong>$1</strong>')
+                // Italic
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/_(.+?)_/g, '<em>$1</em>')
+                // Line breaks
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>')
+                // Unordered lists
+                .replace(/^\- (.+)$/gim, '<li>$1</li>')
+                // Wrap in paragraph tags
+                .replace(/^(?!<[h|l|u])/gim, '<p>')
+                .replace(/(?![h|l|u]>)$/gim, '</p>')
+                // Clean up wrapped list items
+                .replace(/<p><li>/g, '<li>')
+                .replace(/<\/li><\/p>/g, '</li>')
+                // Wrap consecutive list items in ul
+                .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+        }
+
         function displayVerdict(verdict) {
+            const formattedReasoning = parseMarkdown(verdict.reasoning || '');
+
             verdictContent.innerHTML = `
                 <div class="verdict-content">
                     <div class="verdict-label">Verdict:</div>
                     <div class="verdict-text">${verdict.verdict}</div>
 
                     <div class="verdict-label">Reasoning:</div>
-                    <div class="verdict-text">${verdict.reasoning}</div>
+                    <div class="verdict-text">${formattedReasoning}</div>
 
                     <div class="verdict-label">Recommendations:</div>
                     <ul class="recommendations">
-                        ${verdict.recommendations.map(rec => `<li>✓ ${rec}</li>`).join('')}
+                        ${verdict.recommendations.map(rec => `<li>${rec}</li>`).join('')}
                     </ul>
 
                     <div class="verdict-label">Confidence Level:</div>
                     <span class="confidence-badge">${verdict.confidence}</span>
 
                     <div style="margin-top: 30px; padding: 15px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
-                        <strong style="color: #92400e;">⚠️ Important Notice:</strong>
+                        <strong style="color: #92400e;">Important Notice:</strong>
                         <p style="color: #92400e; margin-top: 5px;">
                             This is an AI-assisted analysis for informational purposes only.
                             Final legal decisions should be made by qualified legal professionals.
