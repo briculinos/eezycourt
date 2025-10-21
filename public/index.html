@@ -413,9 +413,7 @@
                 uploadSection.style.display = 'block';
             } else {
                 // User is not logged in
-                authContainer.innerHTML = `
-                    <a href="/auth/google" class="login-btn">🔐 Login with Google</a>
-                `;
+                authContainer.innerHTML = '';
                 uploadSection.innerHTML = `
                     <div class="login-required">
                         <h2>🔒 Authentication Required</h2>
