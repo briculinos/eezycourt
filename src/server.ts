@@ -9,7 +9,7 @@ import { DisputeOrchestrator } from './agents/DisputeOrchestrator';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, '../uploads');
@@ -176,8 +176,8 @@ app.get('/api/cases', (req: Request, res: Response) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🏛️  EezyCourt Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🏛️  EezyCourt Server running on http://0.0.0.0:${PORT}`);
   console.log(`📁 Uploads directory: ${uploadsDir}`);
   console.log(`🤖 Agent orchestration: Ready`);
 });
