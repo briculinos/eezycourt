@@ -77,10 +77,10 @@ export class DisputeOrchestrator {
     this.judicialRecommender = new Agent(
       {
         name: 'JudicialRecommender',
-        role: 'Judicial Decision Recommender',
+        role: 'Judicial Decision Maker',
         description:
-          'Synthesizes all analyses to provide a balanced judicial recommendation based on evidence, law, and fairness principles',
-        objective: 'Generate balanced judicial recommendations',
+          'Synthesizes all analyses to render a definitive judicial conclusion with specific rulings, orders, and remedies that the court should implement',
+        objective: 'Generate a definitive judicial conclusion with specific court orders and rulings',
         model: 'gpt-4o-mini',
         temperature: 0.4,
       },
@@ -151,14 +151,33 @@ Your task is to:
 1. Analyze all documents thoroughly and extract key claims, evidence, and legal arguments
 2. Evaluate the strength and validity of evidence from both parties
 3. Identify relevant legal principles, laws, and precedents that apply
-4. Provide a comprehensive judicial recommendation based on your analysis
+4. Render a DEFINITIVE JUDICIAL CONCLUSION with specific orders and rulings
+
+IMPORTANT FOR THE FINAL AGENT (JudicialRecommender):
+You must provide a CONCLUSION that states what the court/judge SHOULD DO, not just recommendations.
+Your response should include:
+- A clear RULING (e.g., "The court should rule in favor of [Party]", "The court should dismiss the claim", "The court should order...")
+- Specific ORDERS the judge must issue (e.g., "The defendant shall pay...", "The plaintiff's claim is denied...", "Both parties must...")
+- Concrete REMEDIES and actions to be taken
+- FINAL DECISION on each claim
+
+Format your conclusion using markdown with these sections:
+### Judicial Conclusion
+### Ruling
+[State which party prevails and why]
+### Court Orders
+[Specific orders the court shall issue]
+### Remedies
+[Concrete actions and remedies]
+### Final Decision
+[Definitive conclusion on the dispute]
 
 Please provide a thorough analysis considering:
 - Contractual obligations and their interpretation
 - Quality and credibility of evidence
 - Legal precedents and applicable laws
 - Fairness and equity considerations
-- Potential remedies and resolutions
+- Specific remedies and concrete resolutions
 
 Note: This is an AI-assisted analysis for demonstration purposes. In a real scenario, you would have access to the actual document contents through MCP tools.
     `;
