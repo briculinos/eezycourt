@@ -8,7 +8,8 @@ build/
 
 # Env & secrets
 .env
-.env.*
+.env.local
+.env.production
 *.pem
 *.key
 

@@ -254,9 +254,78 @@
             border-left: 4px solid #dc2626;
             margin-top: 20px;
         }
+
+        .auth-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #22c55e;
+        }
+
+        .login-btn, .logout-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .login-btn:hover, .logout-btn:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .logout-btn {
+            background: #ef4444;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .login-required {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .login-required h2 {
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+
+        .login-required p {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
+    <div class="auth-container" id="authContainer"></div>
+
     <div class="container">
         <div class="header">
             <div class="logo">⚖️ EezyCourt</div>
@@ -296,8 +365,55 @@
         const analyzeBtn = document.getElementById('analyzeBtn');
         const verdictSection = document.getElementById('verdictSection');
         const verdictContent = document.getElementById('verdictContent');
+        const authContainer = document.getElementById('authContainer');
+        const uploadSection = document.querySelector('.upload-section');
 
         let selectedFiles = [];
+        let currentUser = null;
+
+        // Check authentication status on page load
+        async function checkAuth() {
+            try {
+                const response = await fetch('/auth/user', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                currentUser = data.user;
+                updateAuthUI();
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                updateAuthUI();
+            }
+        }
+
+        function updateAuthUI() {
+            if (currentUser) {
+                // User is logged in
+                authContainer.innerHTML = `
+                    <div class="user-info">
+                        ${currentUser.picture ? `<img src="${currentUser.picture}" alt="${currentUser.name}" class="user-avatar">` : ''}
+                        <span style="color: #1e293b; font-weight: 600;">${currentUser.name}</span>
+                        <a href="/auth/logout" class="logout-btn">Logout</a>
+                    </div>
+                `;
+                uploadSection.style.display = 'block';
+            } else {
+                // User is not logged in
+                authContainer.innerHTML = `
+                    <a href="/auth/google" class="login-btn">🔐 Login with Google</a>
+                `;
+                uploadSection.innerHTML = `
+                    <div class="login-required">
+                        <h2>🔒 Authentication Required</h2>
+                        <p>Please log in with your Google account to use EezyCourt.</p>
+                        <a href="/auth/google" class="login-btn">Login with Google</a>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize auth check
+        checkAuth();
 
         // Upload area click
         uploadArea.addEventListener('click', () => {

@@ -4,12 +4,18 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import session from 'express-session';
+import passport from 'passport';
 import { DisputeOrchestrator } from './agents/DisputeOrchestrator';
+import { configurePassport, ensureAuthenticated } from './auth/passport-config';
 
 dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
+
+// Configure Passport
+configurePassport();
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, '../uploads');
@@ -45,8 +51,30 @@ const upload = multer({
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true,
+}));
 app.use(express.json());
+
+// Session configuration
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'eezycourt-secret-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Store case data (in production, use a database)
@@ -61,9 +89,38 @@ app.get('/healthz', (req: Request, res: Response) => {
   res.json({ status: 'healthy', service: 'EezyCourt API' });
 });
 
-// Upload documents endpoint
+// Auth routes
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get(
+  '/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  (req: Request, res: Response) => {
+    res.redirect('/');
+  }
+);
+
+app.get('/auth/logout', (req: Request, res: Response) => {
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Logout failed' });
+    }
+    res.redirect('/');
+  });
+});
+
+app.get('/auth/user', (req: Request, res: Response) => {
+  if (req.isAuthenticated()) {
+    res.json({ user: req.user });
+  } else {
+    res.json({ user: null });
+  }
+});
+
+// Upload documents endpoint (protected)
 app.post(
   '/api/upload',
+  ensureAuthenticated,
   upload.array('documents', 10),
   async (req: Request, res: Response) => {
     try {
@@ -104,8 +161,8 @@ app.post(
   }
 );
 
-// Analyze case and get verdict
-app.post('/api/analyze/:caseId', async (req: Request, res: Response) => {
+// Analyze case and get verdict (protected)
+app.post('/api/analyze/:caseId', ensureAuthenticated, async (req: Request, res: Response) => {
   try {
     const { caseId } = req.params;
     const caseData = cases.get(caseId);
