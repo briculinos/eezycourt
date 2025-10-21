@@ -30,6 +30,7 @@
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .logo {
@@ -43,6 +44,48 @@
         .tagline {
             color: #64748b;
             font-size: 16px;
+        }
+
+        .header-user-info {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-user-info .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #22c55e;
+        }
+
+        .header-user-info .user-name {
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .header-user-info .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .header-user-info .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
         .upload-section {
@@ -255,31 +298,7 @@
             margin-top: 20px;
         }
 
-        .auth-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid #22c55e;
-        }
-
-        .login-btn, .logout-btn {
+        .login-btn {
             background: #22c55e;
             color: white;
             border: none;
@@ -293,18 +312,10 @@
             display: inline-block;
         }
 
-        .login-btn:hover, .logout-btn:hover {
+        .login-btn:hover {
             background: #16a34a;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
-        }
-
-        .logout-btn {
-            background: #ef4444;
-        }
-
-        .logout-btn:hover {
-            background: #dc2626;
         }
 
         .login-required {
@@ -338,10 +349,9 @@
     </style>
 </head>
 <body>
-    <div class="auth-container" id="authContainer"></div>
-
     <div class="container">
         <div class="header">
+            <div id="authContainer"></div>
             <div class="logo">⚖️ EezyCourt</div>
             <div class="tagline">AI-Powered Legal Dispute Resolution System</div>
         </div>
@@ -404,9 +414,9 @@
             if (currentUser) {
                 // User is logged in
                 authContainer.innerHTML = `
-                    <div class="user-info">
+                    <div class="header-user-info">
                         ${currentUser.picture ? `<img src="${currentUser.picture}" alt="${currentUser.name}" class="user-avatar">` : ''}
-                        <span style="color: #1e293b; font-weight: 600;">${currentUser.name}</span>
+                        <span class="user-name">${currentUser.name}</span>
                         <a href="/auth/logout" class="logout-btn">Logout</a>
                     </div>
                 `;
