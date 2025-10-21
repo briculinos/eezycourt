@@ -52,8 +52,12 @@ app.use(express.static(path.join(__dirname, '../public')));
 // Store case data (in production, use a database)
 const cases = new Map<string, any>();
 
-// Health check endpoint
+// Health check endpoints
 app.get('/api/health', (req: Request, res: Response) => {
+  res.json({ status: 'healthy', service: 'EezyCourt API' });
+});
+
+app.get('/healthz', (req: Request, res: Response) => {
   res.json({ status: 'healthy', service: 'EezyCourt API' });
 });
 
