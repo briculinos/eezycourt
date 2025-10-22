@@ -3,6 +3,7 @@ import multer from 'multer';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import dotenv from 'dotenv';
 import session from 'express-session';
 import passport from 'passport';
@@ -87,6 +88,22 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Store case data (in production, use a database)
 const cases = new Map<string, any>();
+
+// Verdict cache to store results by document fingerprint
+const verdictCache = new Map<string, any>();
+
+/**
+ * Generate a unique fingerprint for a set of documents
+ * Based on document names, sizes, and party assignments
+ */
+function generateCaseFingerprint(documents: Array<{ name: string; size: number; party: string }>): string {
+  const fingerprint = documents
+    .map((doc) => `${doc.name}|${doc.size}|${doc.party}`)
+    .sort() // Sort to ensure consistent ordering
+    .join('::');
+
+  return crypto.createHash('sha256').update(fingerprint).digest('hex');
+}
 
 // Health check endpoints
 app.get('/api/health', (req: Request, res: Response) => {
@@ -179,6 +196,30 @@ app.post('/api/analyze/:caseId', ensureAuthenticated, async (req: Request, res: 
       return res.status(404).json({ error: 'Case not found' });
     }
 
+    // Generate fingerprint for this case
+    const fingerprint = generateCaseFingerprint(caseData.documents);
+
+    // Check if we have a cached verdict for this exact document set
+    if (verdictCache.has(fingerprint)) {
+      console.log(`Using cached verdict for fingerprint: ${fingerprint.substring(0, 8)}...`);
+      const cachedVerdict = verdictCache.get(fingerprint);
+
+      // Update case with cached verdict
+      caseData.status = 'completed';
+      caseData.verdict = cachedVerdict;
+      caseData.completedAt = new Date().toISOString();
+      caseData.fingerprint = fingerprint;
+      caseData.cached = true;
+      cases.set(caseId, caseData);
+
+      return res.json({
+        success: true,
+        caseId,
+        verdict: cachedVerdict,
+        cached: true,
+      });
+    }
+
     // Check if API key is configured
     const apiKey = process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -192,6 +233,8 @@ app.post('/api/analyze/:caseId', ensureAuthenticated, async (req: Request, res: 
     caseData.status = 'analyzing';
     cases.set(caseId, caseData);
 
+    console.log(`Running new AI analysis for fingerprint: ${fingerprint.substring(0, 8)}...`);
+
     // Initialize the dispute orchestrator
     const provider = process.env.OPENAI_API_KEY ? 'openai' : 'anthropic';
     const orchestrator = new DisputeOrchestrator(apiKey, provider);
@@ -202,16 +245,23 @@ app.post('/api/analyze/:caseId', ensureAuthenticated, async (req: Request, res: 
       documents: caseData.documents,
     });
 
+    // Cache the verdict for future use
+    verdictCache.set(fingerprint, verdict);
+    console.log(`Cached verdict for fingerprint: ${fingerprint.substring(0, 8)}...`);
+
     // Update case with verdict
     caseData.status = 'completed';
     caseData.verdict = verdict;
     caseData.completedAt = new Date().toISOString();
+    caseData.fingerprint = fingerprint;
+    caseData.cached = false;
     cases.set(caseId, caseData);
 
     res.json({
       success: true,
       caseId,
       verdict,
+      cached: false,
     });
   } catch (error) {
     console.error('Analysis error:', error);
